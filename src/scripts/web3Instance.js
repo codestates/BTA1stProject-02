@@ -46,6 +46,21 @@ const web3Instance = {
     changeNet: function (net) {
         this.web3.setProvider(p.netwokrs[net])
         this.currentNet = net;
+    },
+    getAccountList: function () {
+        let accounts = this.web3.eth.getAccounts()
+        let accountsBalance = []
+        const array1 = ['a', 'b']
+        array1.forEach(function(address) {
+            console.log(address)
+            // let balance = this.web3.eth.getBalance(address)
+            // accountsBalance.push(balance)
+        });
+        return {
+            accountList: accounts,
+            accountBalance: accountsBalance
+            // dummy: "123"
+        }
     }
 }
 export default web3Instance;

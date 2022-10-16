@@ -14,9 +14,14 @@
     </a-col>
     <a-col :span="8">
       logo
+<!--      <img src="@/assets/iotex_logo.jpeg"/>-->
     </a-col>
     <a-col :span="8">
-      a
+      <div class="confirm-button">
+        <a-button type="primary" shape="round" @click="getAccountList" style="width:100%">
+          Accounts
+        </a-button>
+      </div>
     </a-col>
   </a-row>
   <a-divider/>
@@ -94,6 +99,7 @@ export default defineComponent({
       } else if (res.sig === "changeNet") {
         port.postMessage({sig: "getSelectedAccount"});
         port.postMessage({sig: "currentNet"})
+        port.postMessage({sig: "getAccountList"})
       }
     })
     let account = ref({})

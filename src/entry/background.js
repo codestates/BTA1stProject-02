@@ -74,6 +74,13 @@ chrome.runtime.onConnect.addListener(function (port) {
             web3Instance.changeNet(msg.net)
             console.log("net changed");
             port.postMessage(JSON.stringify({sig: "changeNet", result: true}))
+        } else if (msg.sig === "getAccountList") {
+            let sample = web3Instance.getAccountList()
+            console.log(sample)
+            web3Instance.getAccountList().then((data) => {
+                port.postMessage(JSON.stringify({sig: "getAccountList", info: data}))
+            })
+            console.log("get accounts list");
         }
         console.log(x, msg);
         x += 1;
