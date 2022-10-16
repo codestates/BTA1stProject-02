@@ -12,21 +12,14 @@
     <div v-if="locked === true">
       <unlock @unlock-event="unlock"/>
     </div>
-    <a-layout v-else-if="locked===false">
-      <a-layout-header>
-        <headerComponent/>
-      </a-layout-header>
-      <a-divider/>
-      <a-layout-content style="background-color: white">
+    <div v-else-if="locked===false">
         <account-view/>
-      </a-layout-content>
-    </a-layout>
+    </div>
   </div>
 </template>
 
 <script>
 import accountView from "@/components/account";
-import headerComponent from "@/components/header"
 import unlock from "@/components/unlock";
 import setPassword from "@/components/setPassword";
 import {ref} from "vue";
@@ -49,7 +42,8 @@ export default {
           port.postMessage({sig: "getStatus"});
         }
       } else if (res.sig === "getStatus") {
-        this.locked.value = res.locked
+        console.log("status", res)
+        locked.value = res.status.locked
       } else if (res.sig === "setPassword") {
         console.log(setPassword)
         setPassword.value = res.setPassword
@@ -70,7 +64,6 @@ export default {
     let generatedMnemonic = () => {
       haveWallet.value = true;
       locked.value = false;
-      port.postMessage({sig: "getSelectedAccount"});
     }
     return {
       locked,
@@ -84,7 +77,6 @@ export default {
   components: {
     CreateMnemonic,
     accountView,
-    headerComponent,
     unlock,
     setPassword,
 
