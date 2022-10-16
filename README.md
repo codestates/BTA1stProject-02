@@ -67,6 +67,7 @@ Flow 스크린샷
 # 4. 프로젝트 상세
 ## 니모닉 코드 생성
 - abc
+- ![create_mnemonic](./image/create_mnemonic.png)
 ## 신규 지갑 주소 발급
 - abc
 ## 로그인 및 지갑 가져오기
