@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "ant-design-vue": "^3.2.13",
+    "bip39": "^3.0.4",
     "core-js": "^3.8.3",
+    "ethereumjs-wallet": "^1.0.2",
     "ethers": "^5.7.1",
     "iotex-antenna": "^0.31.5",
     "vue": "^3.2.13",

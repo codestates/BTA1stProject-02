@@ -6,3 +6,6 @@ git checkout feat/wallet-core
 git add -A
 git status
 git commit -m "add .gitignore"
+
+npm run bulid-watch
+dist

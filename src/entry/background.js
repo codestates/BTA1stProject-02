@@ -1,5 +1,5 @@
 import "@/scripts/window"
-import web3Instance from "@/scripts/wallet"
+import web3Instance from "@/scripts/web3instance"
 
 chrome.runtime.onInstalled.addListener(() => {
         web3Instance.init("mainnet")
@@ -32,3 +32,6 @@ chrome.runtime.onConnect.addListener(function (port) {
 })
 
 let x = 0;
+
+// 00
+// 00
