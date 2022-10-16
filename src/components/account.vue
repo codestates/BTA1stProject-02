@@ -214,8 +214,10 @@ export default defineComponent({
         account.ioAddress = res.info.ioAddress
         account.balance = res.info.balance
         account.transactions = res.info.transactions
-        account.transactions.mainnet.reverse()
-        account.transactions.testnet.reverse()
+        if (account.transactions.mainnet !== undefined)
+          account.transactions.mainnet.reverse()
+        if (account.transactions.testnet !== undefined)
+          account.transactions.testnet.reverse()
         from.value = addressEllipsis(account.ioAddress)
         console.log(res.info.transactions)
       } else if (res.sig === "currentNet") {
