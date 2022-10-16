@@ -1,0 +1,6 @@
+{
+  "netwokrs": {
+    "mainnet": "https://babel-api.mainnet.iotex.io",
+    "testnet": "https://babel-api.testnet.iotex.io"
+  }
+}
