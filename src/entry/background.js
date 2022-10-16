@@ -1,17 +1,18 @@
 import "@/scripts/window"
-import web3Instance from "@/scripts/wallet"
+import web3Instance from "@/scripts/web3Instance"
 
 chrome.runtime.onInstalled.addListener(() => {
         web3Instance.init("mainnet")
+        console.log("installed")
     }
 )
 chrome.runtime.onStartup.addListener(() => {
+        console.log("startup")
         web3Instance.init("mainnet")
     }
 )
 
 let encryptedWallet = "Abcd"
-// eslint-disable-next-line no-unused-vars
 chrome.runtime.onConnect.addListener(function (port) {
     port.onMessage.addListener(function (msg) {
         console.log(msg)

@@ -12,7 +12,6 @@
         <account-view/>
       </a-layout-content>
     </a-layout>
-
   </div>
 </template>
 
@@ -30,7 +29,7 @@ export default {
     });
     port.onMessage.addListener(function (status) {
       console.log("status: ", status)
-      locked.value = Boolean(JSON.parse(status))
+      locked.value = Boolean(JSON.parse(status).locked)
       console.log("locked: ", locked.value)
     })
     port.postMessage({sig: "getStatus"});
