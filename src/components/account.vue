@@ -1,17 +1,38 @@
 <template>
-  <a-layout>
+  <a-row>
+    <a-col :span="8">
+      <a-select
+          ref="select"
+          v-model:value="currentNet"
+          style="width: 100px;"
+          @focus="focus"
+          @change="handleChange"
+      >
+        <a-select-option value="mainnet">메인넷</a-select-option>
+        <a-select-option value="testnet">테스트넷</a-select-option>
+      </a-select>
+    </a-col>
+    <a-col :span="8">
+      logo
+    </a-col>
+    <a-col :span="8">
+      a
+    </a-col>
+  </a-row>
+  <a-divider/>
+  <a-layout v-if="!transfer">
     <a-layout-header>
       <a-row>
         <a-col :span="16"><b>account</b></a-col>
-        <a-col :span="8">{{ addressEllipsis(selectedAddress) }}</a-col>
+        <a-col :span="8">{{ addressEllipsis(account.ioAddress) }}</a-col>
       </a-row>
     </a-layout-header>
     <a-divider/>
     <a-layout-content>
       <div id="explorer">Explorer에서 계정 보기</div>
-      <b id="balance">{{ selectedBalance }} {{ selectedToken }}</b>
+      <b id="balance">{{ account.balance }} IOTX</b>
       <div id="send-button">
-        <a-button type="primary" shape="round">
+        <a-button type="primary" shape="round" @click="transferClick">
           전송
         </a-button>
       </div>
@@ -23,53 +44,84 @@
       </div>
     </a-layout-content>
   </a-layout>
-  <a-button @click="test1">1</a-button>
-  <a-button @click="test2">2</a-button>
-  <a-button @click="test3">3</a-button>
+  <a-layout v-else>
+    <a-layout-header>
+      <a-row>
+        <a-col :span="16">
+          <a-button type="primary" :size="size">
+            <template #icon>
+              <DownloadOutlined/>
+            </template>
+          </a-button>
+        </a-col>
+        <a-col :span="8">{{ addressEllipsis(account.ioAddress) }}</a-col>
+      </a-row>
+    </a-layout-header>
+    <a-divider/>
+    <a-layout-content>
+      <div id="explorer">Explorer에서 계정 보기</div>
+      <b id="balance">{{ account.balance }} IOTX</b>
+      <div id="send-button">
+        <a-button type="primary" shape="round" @click="transferClick">
+          전송
+        </a-button>
+      </div>
+      <a-divider/>
+      <div id="transaction-list">
+        <div class="transaction-list-name">
+          <b>트랜잭션 내역</b>
+        </div>
+      </div>
+    </a-layout-content>
+  </a-layout>
 </template>
 
 <script>
 import {defineComponent, ref} from 'vue';
 
 export default defineComponent({
-  name:"accountComponent",
+  name: "accountComponent",
   setup() {
-    let selectedAddress = ref("0x123454566778899");
-    let selectedToken = ref("IOTX");
-    let selectedBalance = ref("1000.1010101");
+    let port = window.chrome.runtime.connect({
+      name: "account channel"
+    });
+    port.onMessage.addListener((res) => {
+      res = JSON.parse(res);
+      if (res.sig === "getSelectedAccount") {
+        account.value = res.info
+      } else if (res.sig === "currentNet") {
+        currentNet.value = res.net;
+      } else if (res.sig === "changeNet") {
+        port.postMessage({sig: "getSelectedAccount"});
+        port.postMessage({sig: "currentNet"})
+      }
+    })
+    let account = ref({})
+    port.postMessage({sig: "getSelectedAccount"});
+    port.postMessage({sig: "currentNet"})
+
     let addressEllipsis = (address) => {
+      if (address === undefined)
+        return "";
       return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
     }
-    let test1 = () => {
-      let sources = []
-      let items = {key1: 1, key2: 2}
-      sources.push(items)
-      window.chrome.storage.local.set({"sources": sources}, function () {
-        //콜백
-        console.log("저장 되었습니다.")
-      });
+    let currentNet = ref("mainnet");
+    const handleChange = (value) => {
+      port.postMessage({sig: "changeNet", net: value});
+    };
+    let transfer = ref(false)
+    let transferClick = () => {
+      transfer.value = true;
     }
-    let test2 = () => {
-      window.chrome.storage.local.get("sources", function (res) {
-        let value1 = res.sources[0].key1
-        let value2 = res.sources[0].key2
-        console.log(value1, value2)
-      });
-    }
-    let test3 = ()=>{
-      let port = window.chrome.runtime.connect({
-        name: "Sample Communication"
-      });
-      port.postMessage("Hi BackGround");
-    }
+    let size = ref("small")
     return {
-      selectedAddress,
       addressEllipsis,
-      selectedToken,
-      selectedBalance,
-      test1,
-      test2,
-      test3
+      currentNet,
+      handleChange,
+      account,
+      transfer,
+      transferClick,
+      size
     }
   },
 

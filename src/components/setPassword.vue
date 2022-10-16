@@ -34,7 +34,7 @@ export default {
             context.emit("set-password-event");
           }
         });
-        port.postMessage({sig: "setPassword", password: password1});
+        port.postMessage({sig: "setPassword", password: password1.value});
 
       }
     }

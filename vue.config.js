@@ -1,5 +1,6 @@
 const path = require('path')
 const fs = require('fs')
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 // Generate pages object
 const pages = {}
@@ -46,6 +47,7 @@ module.exports = {
     ])
   },
   configureWebpack: {
+    plugins: [new NodePolyfillPlugin()],
     output: {
       filename: `[name].js`,
       chunkFilename: `[name].js`

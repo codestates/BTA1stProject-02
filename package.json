@@ -10,9 +10,14 @@
   },
   "dependencies": {
     "ant-design-vue": "^3.2.13",
+    "bech32": "^2.0.0",
+    "bip39": "^3.0.4",
     "core-js": "^3.8.3",
+    "crypto-js": "^4.1.1",
+    "ethereumjs-wallet": "^1.0.2",
     "ethers": "^5.7.1",
     "iotex-antenna": "^0.31.5",
+    "node-polyfill-webpack-plugin": "^2.0.1",
     "vue": "^3.2.13",
     "web3": "^1.8.0"
   },
