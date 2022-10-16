@@ -106,7 +106,8 @@ const web3Instance = {
         return new Promise((resolve,) => {
             this.getSelectedAccount().then((account) => {
                 chrome.storage.local.get([account.ethAddress], function (data) {
-                    let transactions = data[account.ethAddress].mainnet === undefined ? {
+                    console.log(data)
+                    let transactions = data[account.ethAddress] === undefined ? {
                         mainnet: [],
                         testnet: []
                     } : data[account.ethAddress]
@@ -129,7 +130,7 @@ const web3Instance = {
             returnData.push({
                 ethAddress: accounts[i].address,
                 ioAddress: this.addressToIo(accounts[i].address),
-                balance: balance
+                balance: this.web3.utils.fromWei(balance, "ether")
             })
         }
         return returnData
