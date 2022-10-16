@@ -50,6 +50,7 @@ export default {
       }
     })
     port.postMessage({sig: "haveWallet"});
+
     let locked = ref(true);
     let haveWallet = ref(false);
     let setPassword = ref(false);

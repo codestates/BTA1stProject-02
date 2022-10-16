@@ -65,7 +65,7 @@ chrome.runtime.onConnect.addListener(function (port) {
                 mnemonic: mnemonic
             }))
         } else if (msg.sig === "getSelectedAccount") {
-            web3Instance.getSelectedAddress().then((data) => {
+            web3Instance.getSelectedAccount().then((data) => {
                 port.postMessage(JSON.stringify({sig: "getSelectedAccount", info: data}))
             })
         } else if (msg.sig === "currentNet") {
@@ -74,6 +74,21 @@ chrome.runtime.onConnect.addListener(function (port) {
             web3Instance.changeNet(msg.net)
             console.log("net changed");
             port.postMessage(JSON.stringify({sig: "changeNet", result: true}))
+        } else if (msg.sig === "estimateGas") {
+            web3Instance.estimateGas(msg.from, msg.to, msg.amount).then(estimatedGas => {
+                    port.postMessage(JSON.stringify({
+                        sig: "estimateGas",
+                        estimatedGas
+                    }))
+                }
+            )
+        } else if (msg.sig === "sendTransaction") {
+            web3Instance.sendTransaction(msg.from, msg.to, msg.amount).then(() => {
+                port.postMessage(JSON.stringify({
+                    sig: "sendTransaction",
+                    result: true
+                }))
+            })
         }
         console.log(x, msg);
         x += 1;

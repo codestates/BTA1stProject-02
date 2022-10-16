@@ -20,7 +20,7 @@
     </a-col>
   </a-row>
   <a-divider/>
-  <a-layout v-if="!transfer">
+  <a-layout v-if="!transfer && !transferConfirm">
     <a-layout-header>
       <a-row>
         <a-col :span="16"><b>account</b></a-col>
@@ -41,35 +41,126 @@
         <div class="transaction-list-name">
           <b>트랜잭션 내역</b>
         </div>
+        <a-list item-layout="horizontal" :data-source="account.transactions[currentNet]">
+          <template #renderItem="{ item }">
+            <a-list-item>
+              <a-card :title="'#'+item.txHash" style="width:100%">
+                <div>
+                  from:{{ addressEllipsis(item.from) }}
+                  <br/>
+                  to:{{ addressEllipsis(item.to) }}
+                  <br/>
+                  value:{{ item.value }}
+                </div>
+              </a-card>
+            </a-list-item>
+          </template>
+        </a-list>
       </div>
     </a-layout-content>
   </a-layout>
-  <a-layout v-else>
+  <a-layout v-else-if="transfer&&!transferConfirm">
     <a-layout-header>
-      <a-row>
-        <a-col :span="16">
-          <a-button type="primary" :size="size">
+      <a-row :gutter="24">
+        <a-col :span="3">
+          <a-button :size="size" class="back-button" @click="backToAccount">
             <template #icon>
-              <DownloadOutlined/>
+              <LeftOutlined/>
             </template>
           </a-button>
         </a-col>
-        <a-col :span="8">{{ addressEllipsis(account.ioAddress) }}</a-col>
+        <a-col :span="18">IOTX 전송</a-col>
+        <a-col :span="3"></a-col>
       </a-row>
     </a-layout-header>
     <a-divider/>
     <a-layout-content>
-      <div id="explorer">Explorer에서 계정 보기</div>
-      <b id="balance">{{ account.balance }} IOTX</b>
-      <div id="send-button">
-        <a-button type="primary" shape="round" @click="transferClick">
-          전송
-        </a-button>
+      <div class="transfer-form">
+        <a-row>
+          <a-col :span="7">
+            보내는사람
+          </a-col>
+          <a-col :span="17">
+            <a-input v-model:value="from" placeholder="" disabled="true"/>
+          </a-col>
+        </a-row>
+        <a-row>
+          <a-col :span="7">
+            받는사람
+          </a-col>
+          <a-col :span="17">
+            <a-input v-model:value="to" placeholder=""/>
+          </a-col>
+        </a-row>
+        <a-row>
+          <a-col :span="7">
+            수량
+          </a-col>
+          <a-col :span="17">
+            <a-input v-model:value="amount" placeholder=""/>
+          </a-col>
+        </a-row>
+        <div class="transfer-next">
+          <a-button type="primary" shape="round" style="width: 100%" @click="transferNext">
+            다음
+          </a-button>
+        </div>
       </div>
-      <a-divider/>
-      <div id="transaction-list">
-        <div class="transaction-list-name">
-          <b>트랜잭션 내역</b>
+    </a-layout-content>
+  </a-layout>
+  <a-layout v-if="!transfer&&transferConfirm">
+    <a-layout-header>
+      <a-row :gutter="24">
+        <a-col :span="3">
+          <a-button :size="size" class="back-button" @click="backToTransfer">
+            <template #icon>
+              <LeftOutlined/>
+            </template>
+          </a-button>
+        </a-col>
+        <a-col :span="18">IOTX 전송</a-col>
+        <a-col :span="3"></a-col>
+      </a-row>
+    </a-layout-header>
+    <a-divider/>
+    <a-layout-content>
+      <div class="transfer-form">
+        <a-row>
+          <a-col :span="7">
+            보내는사람
+          </a-col>
+          <a-col :span="17">
+            <a-input v-model:value="from" placeholder="" disabled="true"/>
+          </a-col>
+        </a-row>
+        <a-row>
+          <a-col :span="7">
+            받는사람
+          </a-col>
+          <a-col :span="17">
+            <a-input v-model:value="to" placeholder="" disabled="true"/>
+          </a-col>
+        </a-row>
+        <a-row>
+          <a-col :span="7">
+            수량
+          </a-col>
+          <a-col :span="17">
+            <a-input v-model:value="amount" placeholder="" disabled="true"/>
+          </a-col>
+        </a-row>
+        <a-row>
+          <a-col :span="7">
+            예상 수수료
+          </a-col>
+          <a-col :span="17">
+            <a-input v-model:value="estimatedGas" placeholder="" disabled="true"/>
+          </a-col>
+        </a-row>
+        <div class="transfer-confirm">
+          <a-button type="primary" shape="round" style="width: 100%" @click="sendTransaction">
+            전송
+          </a-button>
         </div>
       </div>
     </a-layout-content>
@@ -77,26 +168,44 @@
 </template>
 
 <script>
-import {defineComponent, ref} from 'vue';
+import {defineComponent, reactive, ref} from 'vue';
+import {LeftOutlined} from '@ant-design/icons-vue';
 
 export default defineComponent({
   name: "accountComponent",
   setup() {
+
     let port = window.chrome.runtime.connect({
       name: "account channel"
     });
     port.onMessage.addListener((res) => {
       res = JSON.parse(res);
       if (res.sig === "getSelectedAccount") {
-        account.value = res.info
+        account.ethAddress = res.info.ethAddress
+        account.ioAddress = res.info.ioAddress
+        account.balance = res.info.balance
+        account.transactions = res.info.transactions
+        account.transactions.mainnet.reverse()
+        account.transactions.testnet.reverse()
+        from.value = addressEllipsis(account.ioAddress)
+        console.log(res.info.transactions)
       } else if (res.sig === "currentNet") {
         currentNet.value = res.net;
       } else if (res.sig === "changeNet") {
         port.postMessage({sig: "getSelectedAccount"});
         port.postMessage({sig: "currentNet"})
+      } else if (res.sig === "estimateGas") {
+        estimatedGas.value = res.estimatedGas + " IOTX";
+      } else if (res.sig === "sendTransaction") {
+        port.postMessage({sig: "getSelectedAccount"});
       }
     })
-    let account = ref({})
+    let account = reactive({
+      ethAddress: "",
+      ioAddress: "",
+      balance: "",
+      transactions: ""
+    })
     port.postMessage({sig: "getSelectedAccount"});
     port.postMessage({sig: "currentNet"})
 
@@ -113,7 +222,33 @@ export default defineComponent({
     let transferClick = () => {
       transfer.value = true;
     }
-    let size = ref("small")
+    let size = ref("large")
+    let backToAccount = () => {
+      transfer.value = false;
+      to.value = ""
+      amount.value = ""
+    }
+    let transferConfirm = ref(false)
+    let to = ref("")
+    let amount = ref("")
+    let from = ref("")
+    let transferNext = () => {
+      transfer.value = false
+      transferConfirm.value = true
+      port.postMessage({sig: "estimateGas", from: account.ethAddress, to: to.value, amount: amount.value})
+    }
+    let estimatedGas = ref("")
+    let backToTransfer = () => {
+      transfer.value = true
+      transferConfirm.value = false
+    }
+    let sendTransaction = () => {
+      transfer.value = false
+      transferConfirm.value = false
+      port.postMessage({sig: "sendTransaction", from: account.ethAddress, to: to.value, amount: amount.value})
+      to.value = ""
+      amount.value = ""
+    }
     return {
       addressEllipsis,
       currentNet,
@@ -121,10 +256,21 @@ export default defineComponent({
       account,
       transfer,
       transferClick,
-      size
+      size,
+      backToAccount,
+      from,
+      to,
+      amount,
+      transferConfirm,
+      transferNext,
+      estimatedGas,
+      backToTransfer,
+      sendTransaction,
     }
   },
-
+  components: {
+    LeftOutlined
+  }
 });
 </script>
 
@@ -175,5 +321,24 @@ export default defineComponent({
 
 .transaction-list-name {
   text-align: start;
+}
+
+
+.back-button {
+  background-color: inherit;
+  border: none;
+}
+
+.ant-input {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.transfer-next {
+  padding-top: 250px;
+}
+
+.transfer-confirm {
+  padding-top: 220px;
 }
 </style>
