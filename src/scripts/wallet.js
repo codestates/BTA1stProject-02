@@ -1,17 +1,5 @@
-import Web3 from 'web3'
-import p from "@/settings.json"
-
-const web3Instance = {
-    init: function (currentNet) {
-        this.web3 = new Web3();
-        this.status = {
-            locked: true
-        }
-        this.web3.setProvider(p.netwokrs[currentNet])
-        console.log(p.netwokrs[currentNet])
-    },
-    decryptWallet: function(password, encryptedWallet){
-        console.log(password, encryptedWallet)
-    }
-}
-export default web3Instance;
+// storeEncryptedWallet 크롬 스토리지에 encrypted된 지갑정보 저장
+// getEncryptedWallet 크롬 스토리지에 저장되어 있는 지갑정보 가져오기
+// createMnemonic 새로운 랜덤 니모닉 생성
+// createInitialAccount 니모닉을 바탕으로 최초 계정 생성
+// hasWallet 이미 생성된 지갑이 있는지 확인

@@ -24,9 +24,9 @@ export default {
       let port = window.chrome.runtime.connect({
         name: "submit password"
       });
-      port.onMessage.addListener((result) => {
-        console.log(result)
-        if (result === "success") {
+      port.onMessage.addListener((res) => {
+        let result = JSON.parse(res).result;
+        if (result) {
           context.emit('unlock-event', true);
         } else {
           console.log("fail")
