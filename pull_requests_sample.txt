@@ -1,8 +1,8 @@
-# 브랜치 생성
+# 브랜치 생성 conflict check
 git branch feat/wallet-core
 git checkout feat/wallet-core
 
 # 커밋
 git add -A
 git status
-c
+git commit -m "add .gitignore"
