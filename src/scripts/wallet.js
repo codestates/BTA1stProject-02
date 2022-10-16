@@ -25,8 +25,9 @@ const wallet = {
     setPassword: function (password) {
         this.password = password;
     },
-    decryptMnemonic: function () {
-        this.mnemonic = CryptoJS.AES.decrypt(this.encryptedMnemonic, this.password);
+    decryptMnemonic: function (encryptedMnemonic) {
+        let key = this.password.padEnd(32, " ")
+        this.mnemonic = this.decodeByAES256(key, encryptedMnemonic)
     },
     storeEncryptedWeb3Wallet: function (encryptedWeb3Wallet) {
         chrome.storage.local.set({encryptedWeb3Wallet})
@@ -37,7 +38,8 @@ const wallet = {
         return this.mnemonic;
     },
     saveMnemonic: function () {
-        this.encryptedMnemonic = CryptoJS.AES.encrypt(this.mnemonic, this.password);
+        let key = this.password.padEnd(32, " ")
+        this.encryptedMnemonic = this.encodeByAES56(key, this.mnemonic);
         chrome.storage.local.set({encryptedMnemonic: this.encryptedMnemonic})
     },
     createAccount: function () {
@@ -56,7 +58,8 @@ const wallet = {
         return new Promise((resolve,) => {
             chrome.storage.local.get(['encryptedMnemonic'], (data) => {
                 self.encryptedMnemonic = data.encryptedMnemonic;
-                resolve()
+                console.log(data.encryptedMnemonic)
+                resolve(data.encryptedMnemonic)
             })
         })
     },
@@ -68,6 +71,22 @@ const wallet = {
                 resolve()
             })
         })
+    },
+    encodeByAES56(key, data) {
+        const cipher = CryptoJS.AES.encrypt(data, CryptoJS.enc.Utf8.parse(key), {
+            iv: CryptoJS.enc.Utf8.parse(""),
+            padding: CryptoJS.pad.Pkcs7,
+            mode: CryptoJS.mode.CBC
+        });
+        return cipher.toString();
+    },
+    decodeByAES256(key, data) {
+        const cipher = CryptoJS.AES.decrypt(data, CryptoJS.enc.Utf8.parse(key), {
+            iv: CryptoJS.enc.Utf8.parse(""),
+            padding: CryptoJS.pad.Pkcs7,
+            mode: CryptoJS.mode.CBC
+        });
+        return cipher.toString(CryptoJS.enc.Utf8);
     }
 }
 export default wallet;

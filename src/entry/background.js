@@ -23,6 +23,7 @@ chrome.runtime.onConnect.addListener(function (port) {
             port.postMessage(JSON.stringify({sig: "getStatus", status: web3Instance.status}));
         } else if (msg.sig === "submitPassword") {
             try {
+                wallet.password = msg.password
                 web3Instance.deserializeWallet(msg.password, wallet.encryptedWeb3Wallet)
                 port.postMessage(JSON.stringify({sig: "submitPassword", result: true}));
             } catch (e) {
@@ -88,6 +89,31 @@ chrome.runtime.onConnect.addListener(function (port) {
                     sig: "sendTransaction",
                     result: true
                 }))
+            })
+
+        } else if (msg.sig === "getAccountList") {
+            web3Instance.getAccountList().then(ret => {
+                port.postMessage(JSON.stringify({sig: "getAccountList", accounts: ret}))
+            })
+        } else if (msg.sig === "changeAccount") {
+            web3Instance.changeAccount(msg.address)
+            port.postMessage(JSON.stringify({sig: "changeAccount"}))
+        } else if (msg.sig === "createAccount") {
+            console.log(wallet.password)
+            wallet.getEncryptedMnemonic().then((encryptedMnemonic) => {
+                console.log(encryptedMnemonic)
+                wallet.decryptMnemonic(encryptedMnemonic);
+                console.log(11111)
+                let privateKey = wallet.createAccount();
+                console.log(22222)
+                web3Instance.addAccount(privateKey);
+                console.log(33333)
+                let encryptedWeb3Wallet = web3Instance.serializeWallet(wallet.password)
+                console.log(44444)
+                wallet.storeEncryptedWeb3Wallet(encryptedWeb3Wallet)
+                console.log(5555)
+                console.log(web3Instance.status.selectedAddress)
+                port.postMessage(JSON.stringify({sig: "createAccount"}))
             })
         }
         console.log(x, msg);

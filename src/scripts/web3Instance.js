@@ -25,6 +25,7 @@ const web3Instance = {
         this.web3.eth.accounts.wallet.create(0);
         this.web3.eth.accounts.wallet.add(privateKey)
         this.status.locked = false;
+        this.status.selectedAddress = this.web3.eth.accounts.wallet[0].address
     },
     serializeWallet: function (password) {
         return this.web3.eth.accounts.wallet.encrypt(password);
@@ -119,6 +120,26 @@ const web3Instance = {
                 })
             })
         })
+    },
+    getAccountList: async function () {
+        let accounts = this.web3.eth.accounts.wallet
+        let returnData = []
+        for (let i = 0; i < accounts.length; i++) {
+            let balance = await this.web3.eth.getBalance(accounts[i].address)
+            returnData.push({
+                ethAddress: accounts[i].address,
+                ioAddress: this.addressToIo(accounts[i].address),
+                balance: balance
+            })
+        }
+        return returnData
+    },
+    changeAccount: function (address) {
+        this.status.selectedAddress = address
+    },
+    addAccount: function (privateKey) {
+        this.web3.eth.accounts.wallet.add(privateKey)
+        this.changeAccount(this.web3.eth.accounts.wallet[this.web3.eth.accounts.wallet.length - 1].address)
     }
 }
 export default web3Instance;
