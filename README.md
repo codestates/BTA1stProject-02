@@ -1,6 +1,4 @@
 # BTA1stProject-02
-- ![demo_1](./image/demo_1.png)
-- ![demo_2](./image/demo2.png)
 
 ---
 # 1. 팀 소개
@@ -9,14 +7,8 @@
   - 팀장: 황인철 (지갑 작동 Flow 설계, 크롬 익스텐션 개발)
   - 팀원: 전종민 (IoTeX 및 백엔드 라이브러리 리서치, 프로젝트 문서 작성)
   - 프로젝트명: HIOTEX
-```shell
-프로젝트
-
-Flow 스크린샷
-
-공간
-
-```
+![demo_1](./image/demo_1.png)
+![demo_2](./image/demo_2.png)
 
 # 2. 선정 코인 소개(IoTex)
 ## 2.1. 개요
@@ -67,16 +59,21 @@ Flow 스크린샷
     
     
 # 4. 프로젝트 상세
-## 니모닉 코드 생성
-- abc
-- ![create_mnemonic](./image/create_mnemonic.png)
-## 신규 지갑 주소 발급
-- abc
-## 로그인 및 지갑 가져오기
-- abc
-## 잔액 조회
-- abc
+## 니모닉 코드 생성 및 신규 지갑 주소 발급
+- bip39 패키지의 generateMnemonic() 함수로 니모닉 코드 12자리를 생성하고, 사용자 비밀번호로 지갑정보를 암호화해 저장합니다.
+![create_mnemonic](./image/demo_1.png)
+
+## 지갑 목록 가져오기 및 잔액 조회
+- 계정관리 메뉴 이동 후 생성 버튼을 클릭하여 신규 계정을 생성합니다.
+![create_mnemonic](./image/accounts_list.png)
+
 ## 송금
-- abc
+- 전송 메뉴로 이동하여 받는사람 주소와 수량을 입력 하여 코인을 전송합니다.
+- 트랜잭션 내역을 확인할 수 있습니다.
+![create_mnemonic](./image/transaction.png)
+
+## 잠금 화면
+![lock](./image/lock.png)
+
 ## 기술 스택
 ![tech_stack](./image/tech_stack.png)
