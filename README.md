@@ -75,3 +75,5 @@ Flow 스크린샷
 - abc
 ## 송금
 - abc
+## 기술 스택
+![tech_stack](./image/tech_stack.png)

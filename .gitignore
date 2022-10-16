@@ -1,2 +1,5 @@
-# etcgit
+# git ignore
 .idea
+.DS_Store
+node_modules/
+dist/
